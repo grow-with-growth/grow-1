@@ -1,0 +1,190 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication and user management
+model User {
+  id             String   @id @default(uuid())
+  email          String   @unique
+  firstName      String
+  lastName       String
+  password       String
+  phone          String?
+  avatar         String?
+  role           Role     @default(USER)
+  isActive       Boolean  @default(true)
+  isEmailVerified Boolean @default(false)
+  lastLoginAt    DateTime?
+  
+  // Organization relationship
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  
+  // Timestamps
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  metrics        Metric[]
+  sessions       UserSession[]
+  passwordResets PasswordReset[]
+  notifications  Notification[]
+  
+  @@map("users")
+}
+
+// Organization model for multi-tenancy
+model Organization {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  website     String?
+  logo        String?
+  isActive    Boolean  @default(true)
+  settings    Json     @default("{}")
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  users       User[]
+  metrics     Metric[]
+  
+  @@map("organizations")
+}
+
+// Metric model for analytics data
+model Metric {
+  id          String     @id @default(uuid())
+  name        String
+  description String?
+  type        MetricType
+  value       Float
+  tags        Json       @default("{}")
+  timestamp   DateTime   @default(now())
+  
+  // User and organization relationships
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("metrics")
+  @@index([userId, timestamp])
+  @@index([organizationId, timestamp])
+  @@index([type, timestamp])
+}
+
+// User session model for authentication
+model UserSession {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshToken String   @unique
+  userAgent    String?
+  ipAddress    String?
+  isActive     Boolean  @default(true)
+  expiresAt    DateTime
+  
+  // Timestamps
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  @@map("user_sessions")
+  @@index([userId])
+  @@index([refreshToken])
+}
+
+// Password reset model
+model PasswordReset {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  isUsed    Boolean  @default(false)
+  expiresAt DateTime
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  
+  @@map("password_resets")
+  @@index([token])
+  @@index([userId])
+}
+
+// Notification model
+model Notification {
+  id       String           @id @default(uuid())
+  userId   String
+  user     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type     NotificationType
+  title    String
+  message  String
+  data     Json             @default("{}")
+  isRead   Boolean          @default(false)
+  readAt   DateTime?
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("notifications")
+  @@index([userId, isRead])
+  @@index([createdAt])
+}
+
+// Audit log model for tracking changes
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  action     String
+  resource   String
+  resourceId String?
+  oldValues  Json?
+  newValues  Json?
+  ipAddress  String?
+  userAgent  String?
+  
+  // Timestamps
+  createdAt  DateTime @default(now())
+  
+  @@map("audit_logs")
+  @@index([userId])
+  @@index([resource, resourceId])
+  @@index([createdAt])
+}
+
+// Enums
+enum Role {
+  USER
+  MANAGER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum MetricType {
+  COUNTER
+  GAUGE
+  HISTOGRAM
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+  SYSTEM
+}

@@ -1,0 +1,36 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "lib": ["ES2022"],
+    "outDir": "./dist",
+    "rootDir": "./src/server",
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "removeComments": false,
+    "allowJs": false,
+    "checkJs": false,
+    "jsx": "preserve",
+    "incremental": true,
+    "tsBuildInfoFile": "./dist/.tsbuildinfo"
+  },
+  "include": [
+    "src/server/**/*",
+    "src/shared/**/*",
+    "src/types/**/*",
+    "src/config/**/*",
+    "src/utils/**/*"
+  ],
+  "exclude": [
+    "src/client/**/*",
+    "src/server/**/*.test.ts",
+    "src/server/**/*.spec.ts",
+    "node_modules",
+    "dist",
+    "build",
+    "coverage"
+  ]
+}
