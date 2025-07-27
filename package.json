@@ -1,0 +1,162 @@
+{
+  "name": "grow-analytics-platform",
+  "version": "1.0.0",
+  "description": "A comprehensive, production-ready growth analytics platform for tracking and visualizing business metrics",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "nodemon --exec ts-node src/server/index.ts",
+    "dev:client": "cd src/client && npm start",
+    "build": "npm run build:server && npm run build:client",
+    "build:server": "tsc -p tsconfig.server.json",
+    "build:client": "cd src/client && npm run build",
+    "start": "node dist/server.js",
+    "test": "jest",
+    "test:unit": "jest --testPathPattern=unit",
+    "test:integration": "jest --testPathPattern=integration",
+    "test:e2e": "playwright test",
+    "test:coverage": "jest --coverage",
+    "test:watch": "jest --watch",
+    "lint": "eslint src --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint src --ext .ts,.tsx,.js,.jsx --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "type-check": "tsc --noEmit",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:seed": "ts-node prisma/seed.ts",
+    "db:studio": "prisma studio",
+    "db:reset": "prisma migrate reset",
+    "db:setup": "npm run db:generate && npm run db:migrate && npm run db:seed",
+    "docker:build": "docker build -t grow-platform .",
+    "docker:run": "docker-compose up -d",
+    "docker:stop": "docker-compose down",
+    "k8s:deploy": "kubectl apply -f k8s/",
+    "k8s:delete": "kubectl delete -f k8s/",
+    "security:audit": "npm audit && snyk test",
+    "security:fix": "npm audit fix",
+    "docs:generate": "typedoc src --out docs/api",
+    "docs:serve": "docsify serve docs",
+    "prepare": "husky install",
+    "precommit": "lint-staged",
+    "release": "semantic-release"
+  },
+  "keywords": [
+    "analytics",
+    "growth",
+    "dashboard",
+    "metrics",
+    "business-intelligence",
+    "react",
+    "nodejs",
+    "typescript",
+    "postgresql",
+    "production-ready"
+  ],
+  "author": "Grow Team <team@grow-platform.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yassine-devdev/grow.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yassine-devdev/grow/issues"
+  },
+  "homepage": "https://github.com/yassine-devdev/grow#readme",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.0.0",
+    "compression": "^1.7.4",
+    "morgan": "^1.10.0",
+    "winston": "^3.10.0",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "joi": "^17.9.2",
+    "express-rate-limit": "^6.8.1",
+    "express-validator": "^7.0.1",
+    "@prisma/client": "^5.1.1",
+    "redis": "^4.6.7",
+    "nodemailer": "^6.9.4",
+    "multer": "^1.4.5-lts.1",
+    "sharp": "^0.32.4",
+    "csv-parser": "^3.0.0",
+    "pdf-lib": "^1.17.1",
+    "moment": "^2.29.4",
+    "lodash": "^4.17.21",
+    "uuid": "^9.0.0",
+    "dotenv": "^16.3.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.4.5",
+    "@types/express": "^4.17.17",
+    "@types/cors": "^2.8.13",
+    "@types/compression": "^1.7.2",
+    "@types/morgan": "^1.9.4",
+    "@types/jsonwebtoken": "^9.0.2",
+    "@types/bcryptjs": "^2.4.2",
+    "@types/multer": "^1.4.7",
+    "@types/lodash": "^4.14.195",
+    "@types/uuid": "^9.0.2",
+    "@types/jest": "^29.5.3",
+    "@types/supertest": "^2.0.12",
+    "@typescript-eslint/eslint-plugin": "^6.2.0",
+    "@typescript-eslint/parser": "^6.2.0",
+    "typescript": "^5.1.6",
+    "ts-node": "^10.9.1",
+    "nodemon": "^3.0.1",
+    "concurrently": "^8.2.0",
+    "jest": "^29.6.1",
+    "ts-jest": "^29.1.1",
+    "supertest": "^6.3.3",
+    "@playwright/test": "^1.36.2",
+    "eslint": "^8.45.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "prettier": "^3.0.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.3",
+    "prisma": "^5.1.1",
+    "semantic-release": "^21.0.7",
+    "typedoc": "^0.24.8",
+    "docsify-cli": "^4.4.4",
+    "snyk": "^1.1193.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,css,md}": [
+      "prettier --write"
+    ]
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "roots": ["<rootDir>/src", "<rootDir>/tests"],
+    "testMatch": ["**/__tests__/**/*.ts", "**/?(*.)+(spec|test).ts"],
+    "collectCoverageFrom": [
+      "src/**/*.ts",
+      "!src/**/*.d.ts",
+      "!src/client/**/*"
+    ],
+    "coverageDirectory": "coverage",
+    "coverageReporters": ["text", "lcov", "html"],
+    "coverageThreshold": {
+      "global": {
+        "branches": 80,
+        "functions": 80,
+        "lines": 80,
+        "statements": 80
+      }
+    }
+  }
+}
